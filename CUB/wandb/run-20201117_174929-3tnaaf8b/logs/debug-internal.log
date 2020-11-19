@@ -1,0 +1,80 @@
+2020-11-17 17:49:29,799 INFO    MainThread:30798 [internal.py:wandb_internal():62] W&B internal server running at pid: 30798
+2020-11-17 17:49:29,803 INFO    WriterThread:30798 [datastore.py:open_for_write():76] open: wandb/run-20201117_174929-3tnaaf8b/run-3tnaaf8b.wandb
+2020-11-17 17:49:29,804 DEBUG   SenderThread:30798 [sender.py:send():89] send: header
+2020-11-17 17:49:29,804 DEBUG   HandlerThread:30798 [handler.py:handle_request():54] handle_request: check_version
+2020-11-17 17:49:29,805 DEBUG   SenderThread:30798 [sender.py:send():89] send: request
+2020-11-17 17:49:29,805 DEBUG   SenderThread:30798 [sender.py:send_request():98] send_request: check_version
+2020-11-17 17:49:29,809 DEBUG   Thread-4  :30798 [connectionpool.py:_new_conn():943] Starting new HTTPS connection (1): pypi.org:443
+2020-11-17 17:49:29,859 DEBUG   Thread-4  :30798 [connectionpool.py:_make_request():442] https://pypi.org:443 "GET /pypi/wandb/json HTTP/1.1" 200 51661
+2020-11-17 17:49:29,879 DEBUG   SenderThread:30798 [sender.py:send():89] send: run
+2020-11-17 17:49:29,882 DEBUG   SenderThread:30798 [git.py:repo():30] git repository is invalid
+2020-11-17 17:49:29,887 DEBUG   SenderThread:30798 [connectionpool.py:_new_conn():943] Starting new HTTPS connection (1): api.wandb.ai:443
+2020-11-17 17:49:30,048 DEBUG   SenderThread:30798 [connectionpool.py:_make_request():442] https://api.wandb.ai:443 "POST /graphql HTTP/1.1" 401 None
+2020-11-17 17:49:30,050 ERROR   SenderThread:30798 [internal_api.py:execute():131] 401 response executing GraphQL.
+2020-11-17 17:49:30,051 ERROR   SenderThread:30798 [internal_api.py:execute():132] {"errors":[{"message":"permission denied","path":["upsertBucket"],"extensions":{"code":"PERMISSION_ERROR"}}],"data":{"upsertBucket":null}}
+2020-11-17 17:49:30,879 INFO    WriterThread:30798 [datastore.py:close():257] close: wandb/run-20201117_174929-3tnaaf8b/run-3tnaaf8b.wandb
+2020-11-17 17:49:30,880 INFO    HandlerThread:30798 [handler.py:finish():267] shutting down handler
+2020-11-17 17:49:30,880 ERROR   MainThread:30798 [internal.py:wandb_internal():128] Thread SenderThread:
+Traceback (most recent call last):
+  File "/mnt/data/hannan/miniconda3/envs/contrastive/lib/python3.6/site-packages/wandb/old/retry.py", line 96, in __call__
+    result = self._call_fn(*args, **kwargs)
+  File "/mnt/data/hannan/miniconda3/envs/contrastive/lib/python3.6/site-packages/wandb/internal/internal_api.py", line 134, in execute
+    six.reraise(*sys.exc_info())
+  File "/mnt/data/hannan/miniconda3/envs/contrastive/lib/python3.6/site-packages/six.py", line 703, in reraise
+    raise value
+  File "/mnt/data/hannan/miniconda3/envs/contrastive/lib/python3.6/site-packages/wandb/internal/internal_api.py", line 128, in execute
+    return self.client.execute(*args, **kwargs)
+  File "/mnt/data/hannan/miniconda3/envs/contrastive/lib/python3.6/site-packages/wandb/vendor/gql-0.2.0/gql/client.py", line 52, in execute
+    result = self._get_result(document, *args, **kwargs)
+  File "/mnt/data/hannan/miniconda3/envs/contrastive/lib/python3.6/site-packages/wandb/vendor/gql-0.2.0/gql/client.py", line 60, in _get_result
+    return self.transport.execute(document, *args, **kwargs)
+  File "/mnt/data/hannan/miniconda3/envs/contrastive/lib/python3.6/site-packages/wandb/vendor/gql-0.2.0/gql/transport/requests.py", line 39, in execute
+    request.raise_for_status()
+  File "/mnt/data/hannan/miniconda3/envs/contrastive/lib/python3.6/site-packages/requests/models.py", line 943, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 401 Client Error: Unauthorized for url: https://api.wandb.ai/graphql
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/mnt/data/hannan/miniconda3/envs/contrastive/lib/python3.6/site-packages/wandb/apis/normalize.py", line 24, in wrapper
+    return func(*args, **kwargs)
+  File "/mnt/data/hannan/miniconda3/envs/contrastive/lib/python3.6/site-packages/wandb/internal/internal_api.py", line 974, in upsert_run
+    response = self.gql(mutation, variable_values=variable_values, **kwargs)
+  File "/mnt/data/hannan/miniconda3/envs/contrastive/lib/python3.6/site-packages/wandb/old/retry.py", line 105, in __call__
+    if not check_retry_fn(e):
+  File "/mnt/data/hannan/miniconda3/envs/contrastive/lib/python3.6/site-packages/wandb/util.py", line 598, in no_retry_auth
+    raise CommError("Invalid or missing api_key.  Run wandb login")
+wandb.errors.error.CommError: Invalid or missing api_key.  Run wandb login
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/mnt/data/hannan/miniconda3/envs/contrastive/lib/python3.6/site-packages/wandb/internal/internal_util.py", line 33, in run
+    self._run()
+  File "/mnt/data/hannan/miniconda3/envs/contrastive/lib/python3.6/site-packages/wandb/internal/internal_util.py", line 60, in _run
+    self._process(record)
+  File "/mnt/data/hannan/miniconda3/envs/contrastive/lib/python3.6/site-packages/wandb/internal/internal.py", line 232, in _process
+    self._sm.send(record)
+  File "/mnt/data/hannan/miniconda3/envs/contrastive/lib/python3.6/site-packages/wandb/internal/sender.py", line 91, in send
+    send_handler(record)
+  File "/mnt/data/hannan/miniconda3/envs/contrastive/lib/python3.6/site-packages/wandb/internal/sender.py", line 378, in send_run
+    self._init_run(run, config_dict)
+  File "/mnt/data/hannan/miniconda3/envs/contrastive/lib/python3.6/site-packages/wandb/internal/sender.py", line 414, in _init_run
+    commit=repo.last_commit,
+  File "/mnt/data/hannan/miniconda3/envs/contrastive/lib/python3.6/site-packages/wandb/apis/normalize.py", line 62, in wrapper
+    six.reraise(CommError, CommError(message, err), sys.exc_info()[2])
+  File "/mnt/data/hannan/miniconda3/envs/contrastive/lib/python3.6/site-packages/six.py", line 702, in reraise
+    raise value.with_traceback(tb)
+  File "/mnt/data/hannan/miniconda3/envs/contrastive/lib/python3.6/site-packages/wandb/apis/normalize.py", line 24, in wrapper
+    return func(*args, **kwargs)
+  File "/mnt/data/hannan/miniconda3/envs/contrastive/lib/python3.6/site-packages/wandb/internal/internal_api.py", line 974, in upsert_run
+    response = self.gql(mutation, variable_values=variable_values, **kwargs)
+  File "/mnt/data/hannan/miniconda3/envs/contrastive/lib/python3.6/site-packages/wandb/old/retry.py", line 105, in __call__
+    if not check_retry_fn(e):
+  File "/mnt/data/hannan/miniconda3/envs/contrastive/lib/python3.6/site-packages/wandb/util.py", line 598, in no_retry_auth
+    raise CommError("Invalid or missing api_key.  Run wandb login")
+wandb.errors.error.CommError: Invalid or missing api_key.  Run wandb login
+2020-11-17 17:49:30,910 DEBUG   raven-sentry.BackgroundWorker:30798 [connectionpool.py:_new_conn():943] Starting new HTTPS connection (1): o151352.ingest.sentry.io:443
+2020-11-17 17:49:31,453 DEBUG   raven-sentry.BackgroundWorker:30798 [connectionpool.py:_make_request():442] https://o151352.ingest.sentry.io:443 "POST /api/5288891/store/ HTTP/1.1" 200 41
+2020-11-17 17:49:32,908 INFO    MainThread:30798 [internal.py:handle_exit():137] Internal process exited

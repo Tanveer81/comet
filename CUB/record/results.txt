@@ -1,0 +1,1 @@
+Time: 20201119-084442, Setting: CUB-novel-Conv4NP-comet-aug 5shot 5way_train 5way_test, Acc: 600 Test Acc = 38.37% +- 0.61% 

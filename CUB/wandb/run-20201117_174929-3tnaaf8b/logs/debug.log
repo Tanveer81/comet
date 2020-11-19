@@ -1,0 +1,6 @@
+2020-11-17 17:49:29,270 INFO    MainThread:30775 [wandb_init.py:_log_setup():293] Logging user logs to wandb/run-20201117_174929-3tnaaf8b/logs/debug.log
+2020-11-17 17:49:29,271 INFO    MainThread:30775 [wandb_init.py:_log_setup():294] Logging internal logs to wandb/run-20201117_174929-3tnaaf8b/logs/debug-internal.log
+2020-11-17 17:49:29,271 INFO    MainThread:30775 [wandb_setup.py:_flush():69] setting env: {}
+2020-11-17 17:49:29,271 INFO    MainThread:30775 [wandb_setup.py:_flush():69] setting user settings: {}
+2020-11-17 17:49:29,271 INFO    MainThread:30775 [wandb_setup.py:_flush():69] multiprocessing start_methods=fork,spawn,forkserver
+2020-11-17 17:50:04,922 INFO    MainThread:30775 [wandb_init.py:teardown():154] tearing down wandb.init
