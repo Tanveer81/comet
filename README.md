@@ -1,5 +1,5 @@
 ## Inclusion Of Transformer Encoder
-This repository aims at including transformer Encoder inside the COMET model for CUB dataset. THe transformer is injected after the concept embedding vectors. See CUB/methods/comet.py file for the implementation details.
+This repository aims at including transformer Encoder inside the COMET model for CUB dataset. The encoder is injected after the concept embedding vectors. See CUB/methods/comet.py file for the implementation details.
 
 
 ## Concept Learners for Generalizable Few-Shot Learning
