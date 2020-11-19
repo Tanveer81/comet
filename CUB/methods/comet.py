@@ -8,9 +8,10 @@ import numpy as np
 import torch.nn.functional as F
 from methods.meta_template import MetaTemplate
 
+# Controls debug messages to be printed in the console with the function log.
 DEBUG = False
 
-
+# Utility function to control debug messages.
 def log(s, q=False):
     if DEBUG:
         print(s)
@@ -24,14 +25,15 @@ class COMET(MetaTemplate):
         self.loss_fn = nn.CrossEntropyLoss()
         self.globalpool = nn.AdaptiveAvgPool2d((1, 1))
         self.wt = nn.Parameter(data=torch.ones(16), requires_grad=True).cuda()
+        
+        # At te initial stage we would create transformer architecture dynamically.
         self.initial = True
 
     def set_forward(self, x, joints=None, is_feature=False):
         z_support, z_query = self.parse_feature(x, joints, is_feature)
 
         z_support = z_support.contiguous()
-        z_proto = z_support.view(self.n_way, self.n_support, -1).mean(
-            1)  # the shape of z is [n_data, n_dim]
+        z_proto = z_support.view(self.n_way, self.n_support, -1).mean(1)  # the shape of z is [n_data, n_dim]
         log(f"prototype dimention {z_proto.shape}")
         z_query = z_query.contiguous().view(self.n_way * self.n_query, -1)
         log(f"z_query dimention {z_query.shape}")
@@ -58,10 +60,12 @@ class COMET(MetaTemplate):
             z_all = self.feature.forward(x)
             log(f"z_all {z_all.shape}")
             z_avg = self.globalpool(z_all).view(z_all.size(0), z_all.size(1))
-            concepts = z_all.size(1)
+            
+            # This is the size of embedding vector of each concept.
+            concept_embedding_size = z_all.size(1)
+            
             log(f"z_avg {z_avg.shape}")
-            joints = joints.contiguous().view(self.n_way * (self.n_support + self.n_query),
-                                              *joints.size()[2:])
+            joints = joints.contiguous().view(self.n_way * (self.n_support + self.n_query), *joints.size()[2:])
             log(f"joints {joints.shape}")
             img_len = x.size()[-1]
             log(f"img_len {img_len}")
@@ -81,42 +85,46 @@ class COMET(MetaTemplate):
                     if joints[i, j, 2] == 1 and joints[i, j, 0] >= 0 and joints[i, j, 1] >= 0 and \
                             joints[i, j, 0] < feat_len and joints[i, j, 1] < feat_len:
                         feat.append(z_all[i, :, joints[i, j, 0], joints[i, j, 1]])
-                    #                         log(f"z_all[i, :, joints[i, j, 0], joints[i, j, 1]] {z_all[i, :, joints[i, j, 0], joints[i, j, 1]].shape}")
                     else:
                         feat.append(z_avg[i, :])
-                #                         log(f"z_avg[i, :] {z_avg[i, :].shape}")
                 feat.append(z_avg[i, :])
-                #                 log(f"feat before cat {feat[0].shape}")
-                feat = torch.cat(feat, dim=0)  ######
-                #                 log(f"feat after cat {feat.shape}",True)
+                feat = torch.cat(feat, dim=0) 
                 feat_list.append(feat.view(1, -1))
             log(f"feat_list[0] {feat_list[0].shape}")
 
-            embedding_length = int(feat_list[0].shape[1] / concepts)
-            log(f"concepts {concepts}")
-            log(f"embedding_length {embedding_length}")
+            # Number of extracted concepts
+            number_of_concepts = int(feat_list[0].shape[1] / concept_embedding_size)
+            log(f"concept_embedding_size {concept_embedding_size}")
+            log(f"number_of_concepts {number_of_concepts}")
+            
+            # In the initial stage transformer encoder is created dynamically based on number of concepts.
             if self.initial:
-                self.encoder_layer = nn.TransformerEncoderLayer(d_model=embedding_length,
-                                                                nhead=8).cuda()
-                self.transformer_encoder = nn.TransformerEncoder(self.encoder_layer,
-                                                                 num_layers=6).cuda()
+                # Concept embedding size is the number of feature for each concept in the sequence.
+                self.encoder_layer = nn.TransformerEncoderLayer(d_model=concept_embedding_size, nhead=8).cuda()
+                self.transformer_encoder = nn.TransformerEncoder(self.encoder_layer, num_layers=6).cuda()
+                # This will block the transformer to be initialized further.
                 self.initial = False
 
             z_all = torch.cat(feat_list, dim=0)
             log(f"z_all1 {z_all.shape}")
+            
+            # Only used transformer for automatic feature extraction
             if is_feature:
                 z_all = z_all.view(self.n_way, self.n_support + self.n_query, -1)
             else:
-                z_all = z_all.view(self.n_way * (self.n_support + self.n_query), -1,
-                                   embedding_length)
+                # The first dimention = batch_size. The embedding was reshaped to be used by transformer.
+                z_all = z_all.view(self.n_way * (self.n_support + self.n_query), number_of_concepts, concept_embedding_size)
                 log(f"z_all2 {z_all.shape}")
-                #         z_all_shape = z_all.shape
-                #         z_all = torch.reshape(z_all, (1, -1, z_all_shape[2]))
+                # Transformer encoder expects the batch_size to be in the second dimention
                 z_all = z_all.permute(1, 0, 2)
+                # Get new embedding vectors from transformer encoder
                 z_all = self.transformer_encoder(z_all)
+                # Bring batch_size to the first dimention again
                 z_all = z_all.permute(1, 0, 2)
+                # Reshaped to the original dimentions again.
                 z_all = torch.reshape(z_all, (self.n_way, self.n_support + self.n_query, -1))
-
+                log(f"z_all3 {z_all.shape}")
+                
         z_support = z_all[:, :self.n_support]
         z_query = z_all[:, self.n_support:]
         log(f"z_support {z_support.shape}")
